@@ -1,5 +1,6 @@
 # Slurm-Graph
 
+
 ## Install
 
 ```sh
@@ -8,6 +9,15 @@ source venv/bin/activate ""
 pip install -e .
 pip install -e .[dev]
 ```
+
+or straight from [GitHub](https://github.com/SamuelLarkin/Slurm-Graph)
+
+```sh
+pip install git+https://github.com/SamuelLarkin/Slurm-Graph
+```
+
+
+## Running
 
 ```sh
 slurm-graph
