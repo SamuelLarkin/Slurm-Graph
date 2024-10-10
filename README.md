@@ -1,6 +1,5 @@
 # Slurm-Graph
 
-
 ## Install
 
 ```sh
@@ -16,6 +15,18 @@ or straight from [GitHub](https://github.com/SamuelLarkin/Slurm-Graph)
 pip install git+https://github.com/SamuelLarkin/Slurm-Graph
 ```
 
+### One file
+
+[PyInstaller Manual](https://pyinstaller.org/en/stable/index.html)
+Install `slurm-graph` as a one binary file.
+
+```sh
+python -m venv venv
+source venv/bin/activate ""
+python -m pip install .[install]
+pyinstaller --onefile venv/bin/slurm-graph
+install dist/slurm-graph ~/.local/bin/
+```
 
 ## Running
 

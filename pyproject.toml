@@ -41,6 +41,7 @@ version = "0.1.0"
 
 [project.optional-dependencies]
 dev = ["black", "isort", "mypy"]
+install = ["pyinstaller"]
 
 [project.scripts]
 slurm-graph = "slurm_graph.__main__:cli"
