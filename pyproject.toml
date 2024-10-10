@@ -35,7 +35,7 @@ dependencies = ["click", "networkx"]
 version = "0.1.0"
 
 [project.optional-dependencies]
-dev = ["black", "isort", "mypy"]
+dev = ["black", "isort", "mypy", "networkx-stubs"]
 debug = ["pudb"]
 install = ["pyinstaller"]
 
