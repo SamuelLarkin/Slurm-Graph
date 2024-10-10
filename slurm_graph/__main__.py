@@ -9,6 +9,46 @@ import click
 
 CMD = "squeue --format='%i,%E,%j,%Z' --noheader"
 
+from dataclasses import dataclass
+
+
+@dataclass(frozen=False)
+class Job:
+    """
+    Job description.
+    """
+
+    id: int
+    name: str
+    workdir: str = None
+    dependencies: set[int] = frozenset()
+    num_dependent: int = 0
+
+    def __str__(self) -> str:
+        if self.workdir:
+            return f"({self.num_dependent}): {self.id}:{self.name}:{self.workdir}"
+        else:
+            # This is the root node
+            return f"({self.num_dependent}): {self.name}"
+
+    def __hash__(self):
+        return hash(str(self.id))
+
+    @classmethod
+    def from_description(cls, line: str):
+        jobid, dependencies, name, workdir = line.strip().split(",")
+        if dependencies == "(null)":
+            dependencies = []
+        else:
+            dependencies = dependencies.strip("afterok:").strip("(unfulfilled)")
+            dependencies = map(int, dependencies.split(","))
+        return cls(
+            id=int(jobid),
+            dependencies=frozenset(dependencies),
+            name=name,
+            workdir=workdir,
+        )
+
 
 @click.command
 @click.option(
@@ -21,6 +61,9 @@ CMD = "squeue --format='%i,%E,%j,%Z' --noheader"
 def cli(
     username: str,
 ):
+    """
+    Display a SLURM's job dependency graph.
+    """
     import shlex
     from subprocess import check_output
 
@@ -29,25 +72,26 @@ def cli(
     cmd = CMD
     if username:
         cmd += f" --user={username}"
-    job_descriptions = check_output(shlex.split(cmd)).decode("UTF-8")
-    job_descriptions = job_descriptions.split()
-    job_descriptions = map(str.strip, job_descriptions)
-    job_descriptions = map(lambda line: line.split(","), job_descriptions)
+
+    job_descriptions = check_output(shlex.split(cmd)).decode("UTF-8").splitlines()
+    jobs = [Job.from_description(description) for description in job_descriptions]
 
     graph = nx.DiGraph()
 
-    root_node = "root_node"
-    graph.add_node(root_node, label="all jobs")
-    for jobid, dependencies, name, workdir in job_descriptions:
-        graph.add_node(jobid, label=f"{jobid}:{name}:{workdir}")
-        if dependencies == "(null)":
-            graph.add_edge(root_node, jobid)
+    nodes = {job.id: job for job in jobs}
+    root_node = Job(id=0, name="all jobs")
+    nodes[root_node.id] = root_node
+    for node in nodes.values():
+        graph.add_node(node)
+
+    for job in jobs:
+        if job.dependencies:
+            for dependency in job.dependencies:
+                graph.add_edge(nodes[dependency], nodes[job.id])
+                nodes[dependency].num_dependent += 1
         else:
-            dependencies = dependencies.strip("afterok:").strip("(unfulfilled)")
-            dependencies = dependencies.split(",")
-            for dependency in dependencies:
-                graph.add_edge(dependency, jobid)
-                # graph.add_edge(jobid, dependency)
+            graph.add_edge(root_node, nodes[job.id])
+            root_node.num_dependent += 1
 
     nx.write_network_text(graph, with_labels=True)
 
