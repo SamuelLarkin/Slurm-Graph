@@ -31,7 +31,7 @@ classifiers = [
   "Topic :: Utilities",
   "Typing :: Typed",
 ]
-dependencies = ["click", "networkx"]
+dependencies = ["click", "networkx", "termcolor"]
 version = "0.1.0"
 
 [project.optional-dependencies]

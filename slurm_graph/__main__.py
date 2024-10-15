@@ -7,7 +7,7 @@ import click
 # \squeue --format='%i,%E,%j,%Z'
 # 494050,afterok:494013,HoC-CL.Tranlation.016,/gpfs/projects/DT/mtp/models/HoC-ContinualLearning/nmt.hp_search/en2fr/continual_learning.grid.02/lr=3.0e-6_e=64/016
 
-CMD = "squeue --format='%i,%E,%j,%Z' --noheader"
+CMD = "squeue --format='%i,%E,%j,%Z,%t' --noheader"
 
 from dataclasses import dataclass
 
@@ -22,21 +22,28 @@ class Job:
     name: str
     workdir: str = None
     dependencies: set[int] = frozenset()
+    status: str = None
     num_dependent: int = 0
 
     def __str__(self) -> str:
+        from termcolor import colored
+
         if self.workdir:
-            return f"({self.num_dependent}): {self.id}:{self.name}:{self.workdir}"
+            color = "light_green" if self.status == "R" else "dark_grey"
+            return colored(
+                f"({self.num_dependent}): {self.id}:{self.name}:{self.workdir}",
+                color,
+            )
         else:
             # This is the root node
-            return f"({self.num_dependent}): {self.name}"
+            return colored(f"({self.num_dependent}): {self.name}", "green")
 
     def __hash__(self):
         return hash(str(self.id))
 
     @classmethod
     def from_description(cls, line: str):
-        jobid, dependencies, name, workdir = line.strip().split(",")
+        jobid, dependencies, name, workdir, status = line.strip().split(",")
         if dependencies == "(null)":
             dependencies = []
         else:
@@ -47,6 +54,7 @@ class Job:
             dependencies=frozenset(dependencies),
             name=name,
             workdir=workdir,
+            status=status,
         )
 
 
