@@ -20,9 +20,9 @@ class Job:
 
     id: int
     name: str
-    workdir: str = None
-    dependencies: set[int] = frozenset()
-    status: str = None
+    workdir: str | None = None
+    dependencies: frozenset[int] = frozenset()
+    status: str | None = None
     num_dependent: int = 0
 
     def __str__(self) -> str:
@@ -43,12 +43,12 @@ class Job:
 
     @classmethod
     def from_description(cls, line: str):
-        jobid, dependencies, name, workdir, status = line.strip().split(",")
-        if dependencies == "(null)":
-            dependencies = []
+        jobid, dependencies_str, name, workdir, status = line.strip().split(",")
+        if dependencies_str == "(null)":
+            dependencies: list[int] = []
         else:
-            dependencies = dependencies.strip("afterok:").strip("(unfulfilled)")
-            dependencies = map(int, dependencies.split(","))
+            dependencies_str = dependencies_str.strip("afterok:").strip("(unfulfilled)")
+            dependencies = [int(dep) for dep in dependencies_str.split(",")]
         return cls(
             id=int(jobid),
             dependencies=frozenset(dependencies),
