@@ -7,7 +7,7 @@ name = "slurm-graph"
 authors = [{ name = "Samuel Larkin", email = "Samuel.Larkin@cnrc-nrc.gc.ca" }]
 description = "Display job dependency tree"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 keywords = ["SLURM", "CLI", "Graph"]
 classifiers = [
   "Framework :: IPython",
@@ -17,7 +17,6 @@ classifiers = [
   "Intended Audience :: Science/Research",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -43,7 +42,9 @@ install = ["pyinstaller"]
 slurm-graph = "slurm_graph.__main__:cli"
 
 [project.urls]
-repository = "https://github.com:SamuelLarkin/Slurm-Graph"
+issues = "https://github.com/SamuelLarkin/Slurm-Graph/issues"
+homepage = "https://github.com/SamuelLarkin/Slurm-Graph"
+repository = "https://github.com/SamuelLarkin/Slurm-Graph"
 
 [tool.mypy]
 files = "slurm_graph"
